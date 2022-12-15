@@ -92,21 +92,24 @@ class main_driver:
     def collect_main_links(self):
         self.driver.get("https://disclosures.utah.gov/Search/PublicSearch")
         WebDriverWait(self.driver, 15, 0.25).until(self.page_loaded)
+        tab_ids = ['PCC', 'CORP', 'ELECT', 'INDEXP', 'LABOR', 'PAC', 'PIC', 'PARTY']
         discovered_links = []
-        for item in self.scroll_to_end(self.driver, ".ui-accordion-header", 6):
+        for item in self.scroll_to_end(self.driver, ".ui-accordion-header", 8):
             item.click()
 
-            WebDriverWait(self.driver, 8).until(self.element_present("html body div#wrapper div#main div#rightColumn div#content div.searchBoxContainerSolid div#accordion.ui-accordion.ui-widget.ui-helper-reset.ui-accordion-icons div.loadContainer.PCC.ui-accordion-content.ui-helper-reset.ui-widget-content.ui-corner-bottom.ui-accordion-content-active fieldset ul.dis-searchlist"))
-            alphabetical_sections = self.driver.find_elements(By.CSS_SELECTOR, "html body div#wrapper div#main div#rightColumn div#content div.searchBoxContainerSolid div#accordion.ui-accordion.ui-widget.ui-helper-reset.ui-accordion-icons div.loadContainer.PCC.ui-accordion-content.ui-helper-reset.ui-widget-content.ui-corner-bottom.ui-accordion-content-active fieldset ul.dis-searchlist")
+        #store links from each tab section
+        for tab_id in tab_ids:
+            print(tab_id)
+            WebDriverWait(self.driver, 8).until(self.element_present(f"html body div#wrapper div#main div#rightColumn div#content div.searchBoxContainerSolid div#accordion.ui-accordion.ui-widget.ui-helper-reset.ui-accordion-icons div.loadContainer.{tab_id}.ui-accordion-content.ui-helper-reset.ui-widget-content.ui-corner-bottom fieldset ul.dis-searchlist"))
+            alphabetical_sections = self.driver.find_elements(By.CSS_SELECTOR, f"html body div#wrapper div#main div#rightColumn div#content div.searchBoxContainerSolid div#accordion.ui-accordion.ui-widget.ui-helper-reset.ui-accordion-icons div.loadContainer.{tab_id}.ui-accordion-content.ui-helper-reset.ui-widget-content.ui-corner-bottom fieldset ul.dis-searchlist")
             for individual_alphabetical_sections in alphabetical_sections:
 
                 for individual_link in self.scroll_to_end(individual_alphabetical_sections, "a", .6):
                     discovered_links.append(individual_link.get_attribute('href'))
-                    print(discovered_links[-1])
-                    break
 
-            break
+        print(len(discovered_links))
 
+        #download from each link
         for individual_link in discovered_links:
             try:
                 self.driver.get(individual_link)
