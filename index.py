@@ -122,11 +122,11 @@ class main_driver:
                     print(tab.get_attribute('innerHTML'))
                     tab.click()
                     time.sleep(2)
-                    links = self.driver.find_element(By.CSS_SELECTOR, ".dis-csv-list li a")
+                    links = self.driver.find_elements(By.CSS_SELECTOR, ".dis-csv-list li a")
                     print(len(links))
-                    # file_to_download_obj = links[len(links)-1]
-                    # file_to_download_obj.click()
-                    # time.sleep(1)
+                    file_to_download_obj = links[len(links)-1]
+                    file_to_download_obj.click()
+                    time.sleep(1)
                     # dialogue_container_css = ".ui-dialog.ui-widget.ui-widget-content"
                     # dialogue_button_css = ".ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only"
                     # dialog_button = self.driver.find_element(By.CSS_SELECTOR, f"{dialogue_container_css}>button{dialogue_button_css}")
