@@ -92,7 +92,7 @@ class main_driver:
     def collect_main_links(self):
         self.driver.get("https://disclosures.utah.gov/Search/PublicSearch")
         WebDriverWait(self.driver, 15, 0.25).until(self.page_loaded)
-        tab_ids = ['PCC', 'CORP', 'ELECT', 'INDEXP', 'LABOR', 'PAC', 'PIC', 'PARTY']
+        tab_ids = ["ELECT"] #['PCC', 'CORP', 'ELECT', 'INDEXP', 'LABOR', 'PAC', 'PIC', 'PARTY']
         discovered_links = []
         for item in self.scroll_to_end(self.driver, ".ui-accordion-header", 8):
             item.click()
@@ -114,13 +114,29 @@ class main_driver:
             try:
                 self.driver.get(individual_link)
                 WebDriverWait(self.driver, 15, 0.25).until(self.page_loaded)
-                file_to_download_obj = self.driver.find_element(By.XPATH, "/html/body/div[2]/div[2]/div[2]/div[2]/div/div/ul[3]/li/a")
-                file_to_download_obj.click()
-                time.sleep(1)
-            except Exception:
-                pass
+                # file_to_download_obj = self.driver.find_element(By.XPATH, "/html/body/div[2]/div[2]/div[2]/div[2]/div/div/ul[3]/li/a")
+                # file_to_download_obj.click()
+                # time.sleep(1)
+                year_tabs = self.driver.find_elements(By.CSS_SELECTOR, ".ui-state-default.ui-corner-top a")
+                for tab in year_tabs:
+                    print(tab.get_attribute('innerHTML'))
+                    tab.click()
+                    time.sleep(2)
+                    links = self.driver.find_element(By.CSS_SELECTOR, ".dis-csv-list li a")
+                    print(len(links))
+                    # file_to_download_obj = links[len(links)-1]
+                    # file_to_download_obj.click()
+                    # time.sleep(1)
+                    # dialogue_container_css = ".ui-dialog.ui-widget.ui-widget-content"
+                    # dialogue_button_css = ".ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only"
+                    # dialog_button = self.driver.find_element(By.CSS_SELECTOR, f"{dialogue_container_css}>button{dialogue_button_css}")
+                    # dialog_button.click()
 
-        self.driver.quit()
+            except Exception as e:
+                # pass
+                print(e)
+
+       #self.driver.quit()
 
 if __name__ == '__main__':
     driver_obj = main_driver()
