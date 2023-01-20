@@ -27,13 +27,6 @@ KINESIS_SIZE_LIMIT = 1000000  # actually, it is 1048576
 class main_driver:
 
     def __init__(self):
-        # options = webdriver.ChromeOptions()
-        # options.add_argument("--headless")
-        # options.add_argument("--disable-gpu")
-        # options.add_argument("--single-process")
-        # options.add_argument("--no-sandbox")
-        # options.add_argument("--disable-dev-shm-usage")
-        # options.add_argument("--window-size=1700x800")
         self.driver = webdriver.Chrome()
 
 
@@ -99,7 +92,6 @@ class main_driver:
 
         #store links from each tab section
         for tab_id in tab_ids:
-            print(tab_id)
             WebDriverWait(self.driver, 8).until(self.element_present(f"html body div#wrapper div#main div#rightColumn div#content div.searchBoxContainerSolid div#accordion.ui-accordion.ui-widget.ui-helper-reset.ui-accordion-icons div.loadContainer.{tab_id}.ui-accordion-content.ui-helper-reset.ui-widget-content.ui-corner-bottom fieldset ul.dis-searchlist"))
             alphabetical_sections = self.driver.find_elements(By.CSS_SELECTOR, f"html body div#wrapper div#main div#rightColumn div#content div.searchBoxContainerSolid div#accordion.ui-accordion.ui-widget.ui-helper-reset.ui-accordion-icons div.loadContainer.{tab_id}.ui-accordion-content.ui-helper-reset.ui-widget-content.ui-corner-bottom fieldset ul.dis-searchlist")
             for individual_alphabetical_sections in alphabetical_sections:
@@ -107,30 +99,22 @@ class main_driver:
                 for individual_link in self.scroll_to_end(individual_alphabetical_sections, "a", .6):
                     discovered_links.append(individual_link.get_attribute('href'))
 
-        print(len(discovered_links))
-
         #download from each link
         for individual_link in discovered_links:
             try:
                 self.driver.get(individual_link)
                 WebDriverWait(self.driver, 15, 0.25).until(self.page_loaded)
-                # file_to_download_obj = self.driver.find_element(By.XPATH, "/html/body/div[2]/div[2]/div[2]/div[2]/div/div/ul[3]/li/a")
-                # file_to_download_obj.click()
-                # time.sleep(1)
-                year_tabs = self.driver.find_elements(By.CSS_SELECTOR, ".ui-state-default.ui-corner-top a")
-                for tab in year_tabs:
-                    print(tab.get_attribute('innerHTML'))
-                    tab.click()
-                    time.sleep(2)
-                    links = self.driver.find_elements(By.CSS_SELECTOR, ".dis-csv-list li a")
-                    print(len(links))
-                    file_to_download_obj = links[len(links)-1]
-                    file_to_download_obj.click()
+
+                for year_tab in self.scroll_to_end(self.driver, '.ui-state-default.ui-corner-top a', 1):
+                    year_num = year_tab.get_attribute('innerHTML')
+                    year_tab.click()
                     time.sleep(1)
-                    # dialogue_container_css = ".ui-dialog.ui-widget.ui-widget-content"
-                    # dialogue_button_css = ".ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only"
-                    # dialog_button = self.driver.find_element(By.CSS_SELECTOR, f"{dialogue_container_css}>button{dialogue_button_css}")
-                    # dialog_button.click()
+
+                    print(year_num)
+                    for download_link in self.scroll_to_end(self.driver, "#reporterYears .dis-csv-list li a", 1):
+                        link_href = download_link.get_attribute('href')
+                        if "javascript:openDialog('#csvDialog')" not in link_href:
+                            print(f"valid: {link_href}")
 
             except Exception as e:
                 # pass
